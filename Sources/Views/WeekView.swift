@@ -171,7 +171,6 @@ final class WeekView: UIView {
     init(calendar: Calendar, config: FastisConfig.WeekView, localIdentifier: String? = "en") {
         self.config = config
         self.calendar = calendar
-        self.calendar.firstWeekday = 1
 
         if let identifier = localIdentifier {
             self.localIdentifier = Locale(identifier: identifier)
@@ -219,8 +218,8 @@ final class WeekView: UIView {
 
     private func configureConstraints() {
         NSLayoutConstraint.activate([
-            self.stackView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 4),
-            self.stackView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -4),
+            self.stackView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 4),
+            self.stackView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -4),
             self.stackView.topAnchor.constraint(equalTo: self.topAnchor),
             self.stackView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         ])

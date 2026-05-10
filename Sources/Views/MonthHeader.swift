@@ -24,8 +24,8 @@ public final class MonthHeader: JTACMonthReusableView {
 
     // MARK: - Variables
 
-    private var leftAnchorConstraint: NSLayoutConstraint?
-    private var rightAnchorConstraint: NSLayoutConstraint?
+    private var leadingAnchorConstraint: NSLayoutConstraint?
+    private var trailingAnchorConstraint: NSLayoutConstraint?
     private var topAnchorConstraint: NSLayoutConstraint?
     private var bottomAnchorConstraint: NSLayoutConstraint?
 
@@ -59,12 +59,12 @@ public final class MonthHeader: JTACMonthReusableView {
     }
 
     private func configureConstraints() {
-        self.leftAnchorConstraint = self.monthLabel.leftAnchor.constraint(equalTo: self.leftAnchor)
-        self.rightAnchorConstraint = self.monthLabel.rightAnchor.constraint(equalTo: self.rightAnchor)
+        self.leadingAnchorConstraint = self.monthLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor)
+        self.trailingAnchorConstraint = self.monthLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         self.topAnchorConstraint = self.monthLabel.topAnchor.constraint(equalTo: self.topAnchor)
         self.bottomAnchorConstraint = self.monthLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         NSLayoutConstraint.activate([
-            self.leftAnchorConstraint, self.rightAnchorConstraint, self.topAnchorConstraint, self.bottomAnchorConstraint
+            self.leadingAnchorConstraint, self.trailingAnchorConstraint, self.topAnchorConstraint, self.bottomAnchorConstraint
         ].compactMap({ $0 }))
     }
 
@@ -122,8 +122,8 @@ public final class MonthHeader: JTACMonthReusableView {
             self.monthLabel.textAlignment = config.labelAlignment
         }
 
-        self.leftAnchorConstraint?.constant = config.insets.left
-        self.rightAnchorConstraint?.constant = -config.insets.right
+        self.leadingAnchorConstraint?.constant = config.insets.left
+        self.trailingAnchorConstraint?.constant = -config.insets.right
         self.topAnchorConstraint?.constant = config.insets.top
         self.bottomAnchorConstraint?.constant = -config.insets.bottom
     }

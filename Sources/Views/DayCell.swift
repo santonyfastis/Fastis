@@ -56,6 +56,7 @@ public final class DayCell: JTACDayCell {
     private var todayConfig: FastisConfig.TodayCell? = FastisConfig.default.todayCell
     private var rangeViewTopAnchorConstraints: [NSLayoutConstraint] = []
     private var rangeViewBottomAnchorConstraints: [NSLayoutConstraint] = []
+    private var rightRangeViewTrailingConstraint: NSLayoutConstraint?
 
     public var localIdentifier: Locale?
 
@@ -118,13 +119,15 @@ public final class DayCell: JTACDayCell {
             self.dateLabel.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor)
         ])
         NSLayoutConstraint.activate([
-            self.leftRangeView.leftAnchor.constraint(equalTo: self.contentView.leftAnchor),
-            self.leftRangeView.rightAnchor.constraint(equalTo: self.contentView.centerXAnchor)
+            self.leftRangeView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
+            self.leftRangeView.trailingAnchor.constraint(equalTo: self.contentView.centerXAnchor)
         ])
+        let rightRangeViewTrailingConstraint = self.rightRangeView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: 0)
+        self.rightRangeViewTrailingConstraint = rightRangeViewTrailingConstraint
         NSLayoutConstraint.activate([
-            self.rightRangeView.leftAnchor.constraint(equalTo: self.contentView.centerXAnchor),
-            // Add small offset to prevent spacing between cells
-            self.rightRangeView.rightAnchor.constraint(equalTo: self.contentView.rightAnchor, constant: 1)
+            self.rightRangeView.leadingAnchor.constraint(equalTo: self.contentView.centerXAnchor),
+            // Remove offset to prevent dark lines from overlapping translucent backgrounds
+            rightRangeViewTrailingConstraint
         ])
         NSLayoutConstraint.activate([
             {
@@ -132,9 +135,9 @@ public final class DayCell: JTACDayCell {
                 constraint.priority = .defaultLow
                 return constraint
             }(),
-            self.selectionBackgroundView.leftAnchor.constraint(greaterThanOrEqualTo: self.contentView.leftAnchor, constant: 1),
+            self.selectionBackgroundView.leadingAnchor.constraint(greaterThanOrEqualTo: self.contentView.leadingAnchor, constant: 1),
             self.selectionBackgroundView.topAnchor.constraint(greaterThanOrEqualTo: self.contentView.topAnchor, constant: 1),
-            self.selectionBackgroundView.rightAnchor.constraint(lessThanOrEqualTo: self.contentView.rightAnchor, constant: -1),
+            self.selectionBackgroundView.trailingAnchor.constraint(lessThanOrEqualTo: self.contentView.trailingAnchor, constant: -1),
             self.selectionBackgroundView.bottomAnchor.constraint(lessThanOrEqualTo: self.contentView.bottomAnchor, constant: -1),
             self.selectionBackgroundView.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
             self.selectionBackgroundView.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor),
@@ -185,17 +188,8 @@ public final class DayCell: JTACDayCell {
                 }
 
                 if showRangeView {
-
-                    if state.day.rawValue == calendar.firstWeekday {
-                        config.rangeView.leftSideState = .rounded
-                        config.rangeView.rightSideState = .squared
-                    } else if state.day.rawValue == calendar.lastWeekday {
-                        config.rangeView.leftSideState = .squared
-                        config.rangeView.rightSideState = .rounded
-                    } else {
-                        config.rangeView.leftSideState = .squared
-                        config.rangeView.rightSideState = .squared
-                    }
+                    config.rangeView.leftSideState = .squared
+                    config.rangeView.rightSideState = .squared
                 }
 
             }
@@ -222,35 +216,18 @@ public final class DayCell: JTACDayCell {
             case .full:
                 config.isSelectedViewHidden = false
 
-            case .left,
-                 .right,
-                 .middle:
-                config.isSelectedViewHidden = position == .middle
+            case .left:
+                config.isSelectedViewHidden = false
+                config.rangeView.rightSideState = .squared
 
-                if position == .right, state.day.rawValue == calendar.firstWeekday {
-                    config.rangeView.leftSideState = .rounded
+            case .right:
+                config.isSelectedViewHidden = false
+                config.rangeView.leftSideState = .squared
 
-                } else if position == .left, state.day.rawValue == calendar.lastWeekday {
-                    config.rangeView.rightSideState = .rounded
-
-                } else if position == .left {
-                    config.rangeView.rightSideState = .squared
-
-                } else if position == .right {
-                    config.rangeView.leftSideState = .squared
-
-                } else if state.day.rawValue == calendar.firstWeekday {
-                    config.rangeView.leftSideState = .rounded
-                    config.rangeView.rightSideState = .squared
-
-                } else if state.day.rawValue == calendar.lastWeekday {
-                    config.rangeView.leftSideState = .squared
-                    config.rangeView.rightSideState = .rounded
-
-                } else {
-                    config.rangeView.leftSideState = .squared
-                    config.rangeView.rightSideState = .squared
-                }
+            case .middle:
+                config.isSelectedViewHidden = true
+                config.rangeView.leftSideState = .squared
+                config.rangeView.rightSideState = .squared
 
             default:
                 break
@@ -289,12 +266,17 @@ public final class DayCell: JTACDayCell {
 
     internal func configure(for config: ViewConfig) {
 
-        // Correct character orientation for Arabic
-        if self.localIdentifier?.identifier.lowercased().contains("ar") == true {
-            self.contentView.transform = CGAffineTransform(scaleX: -1, y: 1)
+        let isArabic = self.localIdentifier?.identifier.lowercased().contains("ar") == true
+
+        // Only the label should be mirrored
+        if isArabic {
+            dateLabel.transform = CGAffineTransform(scaleX: -1, y: 1)
         } else {
-            self.contentView.transform = .identity
+            self.dateLabel.transform = .identity
         }
+
+        // Prevent mirroring of the blue component (background)
+        self.contentView.transform = .identity
 
         self.selectionBackgroundView.isHidden = config.isSelectedViewHidden
         self.isUserInteractionEnabled = config.dateLabelText != nil && config.isDateEnabled
@@ -321,7 +303,8 @@ public final class DayCell: JTACDayCell {
             self.rightRangeView.layer.maskedCorners = []
         case .rounded:
             self.rightRangeView.isHidden = false
-            self.rightRangeView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+            // In RTL, the "right" half of the logical range logic needs rounding on its visual Left edge (MinX)
+            self.rightRangeView.layer.maskedCorners = isArabic ? [.layerMinXMinYCorner, .layerMinXMaxYCorner] : [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         case .hidden:
             self.rightRangeView.isHidden = true
         }
@@ -332,7 +315,8 @@ public final class DayCell: JTACDayCell {
             self.leftRangeView.layer.maskedCorners = []
         case .rounded:
             self.leftRangeView.isHidden = false
-            self.leftRangeView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+            // In RTL, the "left" half (start) of range needs rounding on its visual Right edge (MaxX)
+            self.leftRangeView.layer.maskedCorners = isArabic ? [.layerMaxXMinYCorner, .layerMaxXMaxYCorner] : [.layerMinXMinYCorner, .layerMinXMaxYCorner]
         case .hidden:
             self.leftRangeView.isHidden = true
         }

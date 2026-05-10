@@ -372,32 +372,32 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
         if !self.privateCloseOnSelectionImmediately {
             NSLayoutConstraint.activate([
                 self.currentValueView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-                self.currentValueView.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 12),
-                self.currentValueView.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -12)
+                self.currentValueView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 12),
+                self.currentValueView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -12)
             ])
             NSLayoutConstraint.activate([
                 self.weekView.topAnchor.constraint(equalTo: self.currentValueView.bottomAnchor),
-                self.weekView.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 12),
-                self.weekView.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -12)
+                self.weekView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 12),
+                self.weekView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -12)
             ])
         } else {
             NSLayoutConstraint.activate([
                 self.weekView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-                self.weekView.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 12),
-                self.weekView.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -12)
+                self.weekView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 12),
+                self.weekView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -12)
             ])
         }
         if !self.shortcuts.isEmpty {
             NSLayoutConstraint.activate([
                 self.shortcutContainerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-                self.shortcutContainerView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-                self.shortcutContainerView.rightAnchor.constraint(equalTo: self.view.rightAnchor)
+                self.shortcutContainerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+                self.shortcutContainerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
             ])
         }
         NSLayoutConstraint.activate([
             self.calendarView.topAnchor.constraint(equalTo: self.weekView.bottomAnchor),
-            self.calendarView.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 16),
-            self.calendarView.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -16)
+            self.calendarView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 16),
+            self.calendarView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -16)
         ])
         if !self.shortcuts.isEmpty {
             NSLayoutConstraint.activate([
@@ -626,7 +626,7 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             calendar: self.config.calendar,
             generateInDates: .forAllMonths,
             generateOutDates: .tillEndOfRow,
-            firstDayOfWeek: .sunday,
+            firstDayOfWeek: DaysOfWeek(rawValue: self.config.calendar.firstWeekday) ?? .sunday,
             hasStrictBoundaries: true
         )
         return parameters

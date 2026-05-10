@@ -11,10 +11,10 @@ import UIKit
 
 
 
-final class MonthHeader: JTACMonthReusableView {
+public final class MonthHeader: JTACMonthReusableView {
 
     // MARK: - Outlets
-    private lazy var monthLabel: UILabel = {
+    public lazy var monthLabel: UILabel = {
         let label = UILabel()
         label.text = "Month name"
         label.translatesAutoresizingMaskIntoConstraints = false

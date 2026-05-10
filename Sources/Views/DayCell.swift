@@ -9,11 +9,11 @@
 import JTAppleCalendar
 import UIKit
 
-final class DayCell: JTACDayCell {
+public final class DayCell: JTACDayCell {
 
     // MARK: - Outlets
 
-    lazy var dateLabel: UILabel = {
+    public lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false

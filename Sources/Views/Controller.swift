@@ -213,8 +213,15 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
      public var numberOfDatesSelected: Int = 0
      public var isArabic: Bool? = false
 
+    /**
+     The block to execute for custom cell configuration
+     */
+    public var dayCellConfigurator: ((UICollectionViewCell) -> Void)?
 
-
+    /**
+     The block to execute for custom month header configuration
+     */
+    public var monthHeaderConfigurator: ((JTACMonthReusableView) -> Void)?
 
     /**
      Allow to choose `nil` date
@@ -464,6 +471,7 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             cell.applyConfig(self.config)
             cell.configure(for: newConfig)
         }
+        self.dayCellConfigurator?(cell)
     }
 
     // MARK: - Actions
@@ -658,6 +666,7 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
                 self.selectRange(newValue, in: calendar)
             }
         }
+        self.monthHeaderConfigurator?(header)
         return header
     }
 

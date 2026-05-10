@@ -69,6 +69,14 @@ public final class MonthHeader: JTACMonthReusableView {
     }
 
     internal func configure(for date: Date) {
+
+        if self.localIdentifier?.identifier.lowercased().contains("ar") == true {
+            self.monthLabel.transform = CGAffineTransform(scaleX: -1, y: 1)
+            self.monthLabel.textAlignment = .right
+        } else {
+            self.monthLabel.transform = .identity
+        }
+
         /*
          Gregorian
 
@@ -85,7 +93,7 @@ public final class MonthHeader: JTACMonthReusableView {
          }
          */
         
-        self.monthLabel.textAlignment = self.localIdentifier?.identifier == "ar_EG" ? .right : .left
+        // self.monthLabel.textAlignment handled by mirror logic
         if (typeCalender?.identifier == .islamicUmmAlQura) {
             let hijriDate = HijriDate.convertGregorianToHijri(date: date)
             if let hijriMonth = HijriDate.getHijriMonth(from: date, localIdentifier: self.localIdentifier?.identifier ?? "EN") {
@@ -105,7 +113,15 @@ public final class MonthHeader: JTACMonthReusableView {
 //        config.monthLocale
         self.monthLabel.font = config.labelFont
         self.monthLabel.textColor = config.labelColor
-        self.monthLabel.textAlignment = config.labelAlignment
+        
+        if self.localIdentifier?.identifier.lowercased().contains("ar") == true {
+            self.monthLabel.transform = CGAffineTransform(scaleX: -1, y: 1)
+            self.monthLabel.textAlignment = .right
+        } else {
+            self.monthLabel.transform = .identity
+            self.monthLabel.textAlignment = config.labelAlignment
+        }
+
         self.leftAnchorConstraint?.constant = config.insets.left
         self.rightAnchorConstraint?.constant = -config.insets.right
         self.topAnchorConstraint?.constant = config.insets.top

@@ -73,7 +73,7 @@ public final class DayCell: JTACDayCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func prepareForReuse() {
+    public override func prepareForReuse() {
         super.prepareForReuse()
         self.circleView.removeFromSuperview()
     }
@@ -261,32 +261,40 @@ public final class DayCell: JTACDayCell {
         return config
     }
 
-    enum RangeSideState {
+    public enum RangeSideState {
         case squared
         case rounded
         case hidden
     }
 
-    struct RangeViewConfig: Hashable {
+    public struct RangeViewConfig: Hashable {
 
-        var leftSideState: RangeSideState = .hidden
-        var rightSideState: RangeSideState = .hidden
+        public var leftSideState: RangeSideState = .hidden
+        public var rightSideState: RangeSideState = .hidden
 
-        var isHidden: Bool {
+        public var isHidden: Bool {
             self.leftSideState == .hidden && self.rightSideState == .hidden
         }
 
     }
 
-    struct ViewConfig {
-        var dateLabelText: String?
-        var isSelectedViewHidden = true
-        var isDateEnabled = true
-        var rangeView = RangeViewConfig()
-        var isToday = false
+    public struct ViewConfig {
+        public var dateLabelText: String?
+        public var isSelectedViewHidden = true
+        public var isDateEnabled = true
+        public var rangeView = RangeViewConfig()
+        public var isToday = false
+        public init() {}
     }
 
     internal func configure(for config: ViewConfig) {
+
+        // Correct character orientation for Arabic
+        if self.localIdentifier?.identifier.lowercased().contains("ar") == true {
+            self.contentView.transform = CGAffineTransform(scaleX: -1, y: 1)
+        } else {
+            self.contentView.transform = .identity
+        }
 
         self.selectionBackgroundView.isHidden = config.isSelectedViewHidden
         self.isUserInteractionEnabled = config.dateLabelText != nil && config.isDateEnabled

@@ -122,7 +122,9 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
     }()
 
     private lazy var weekView: WeekView = {
-        let view = WeekView(calendar: self.config.calendar, config: self.config.weekView, localIdentifier: self.localIdentifier?.identifier)
+        var cal = self.config.calendar
+        cal.firstWeekday = 1
+        let view = WeekView(calendar: cal, config: self.config.weekView, localIdentifier: self.localIdentifier?.identifier)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -361,7 +363,8 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             self.view.addSubview(self.currentValueView)
         }
         self.weekView.localIdentifier = localIdentifier
-        self.view.addSubview(self.weekView)
+        let weekView = self.weekView
+        self.view.addSubview(weekView)
         self.view.addSubview(self.calendarView)
         if !self.shortcuts.isEmpty {
             self.view.addSubview(self.shortcutContainerView)
@@ -444,7 +447,7 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             )
 
             if newConfig.dateLabelText != nil {
-                if (typeCalendar == Calendar(identifier: .gregorian)) {
+                if (typeCalendar?.identifier == .gregorian) {
                     newConfig.dateLabelText = self.dayFormatter.string(from: date)
                 } else {
                     let islamicCalendar = Calendar(identifier: .islamicUmmAlQura)

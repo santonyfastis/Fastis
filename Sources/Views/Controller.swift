@@ -524,21 +524,24 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             }
 
         case .range:
-
-            if self.allowToChooseNilDate,
-               let oldValue = self.value as? FastisRange,
-               date.isInSameDay(in: self.config.calendar, date: oldValue.fromDate),
-               date.isInSameDay(in: self.config.calendar, date: oldValue.toDate)
+            
+            if let oldValue = self.value as? FastisRange,
+               !oldValue.fromDate.isInSameDay(date: oldValue.toDate),
+               (date.isInSameDay(in: self.config.calendar, date: oldValue.fromDate) ||
+                date.isInSameDay(in: self.config.calendar, date: oldValue.toDate))
             {
-                self.clear()
-
+                self.done()
+            } else if self.allowToChooseNilDate,
+                      let oldValue = self.value as? FastisRange,
+                      date.isInSameDay(in: self.config.calendar, date: oldValue.fromDate),
+                      date.isInSameDay(in: self.config.calendar, date: oldValue.toDate)
+            {
+                self.done()
             } else {
-
                 let newValue: FastisRange = {
                     guard let oldValue = self.value as? FastisRange else {
                         return .from(date.startOfDay(in: self.config.calendar), to: date.endOfDay(in: self.config.calendar))
                     }
-
                     let dateRangeChangesDisabled = !self.allowDateRangeChanges
                     let rangeSelected = !oldValue.fromDate.isInSameDay(date: oldValue.toDate)
                     if dateRangeChangesDisabled, rangeSelected {
@@ -556,12 +559,9 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
                         let newToDate = date.endOfDay(in: self.config.calendar)
                         return .from(oldValue.fromDate, to: newToDate)
                     }
-
                 }()
-
                 self.value = newValue as? Value
                 self.selectValue(newValue as? Value, in: calendar)
-
             }
 
         }
@@ -577,14 +577,21 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             triggerSelectionDelegate: true,
             keepSelectionIfMultiSelectionAllowed: false
         )
+        
         calendar.visibleDates { segment in
             UIView.performWithoutAnimation {
                 calendar.reloadItems(at: (segment.outdates + segment.indates).map(\.indexPath))
+                let allVisibleIndexPaths = (segment.monthDates + segment.outdates +  segment.indates).map(\.indexPath)
+                calendar.reloadItems(at: allVisibleIndexPaths)
             }
         }
     }
-
+    
     private func clear() {
+        var visibleDate: Date? = nil
+        self.calendarView.visibleDates { segment in
+            visibleDate = segment.monthDates.first?.date
+        }
         self.value = nil
         self.viewConfigs.removeAll()
         self.calendarView.deselectAllDates()
@@ -592,8 +599,11 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             [weak self] in
             guard let self else {return}
             self.calendarView.reloadData()
+            if let dateToScroll = visibleDate {
+                self.calendarView.scrollToHeaderForDate(dateToScroll)
+            }
         }
-        self.dismiss(animated: false)
+        //        self.dismiss(animated: false)
         self.dismissHandler?(.done(self.value))
     }
 

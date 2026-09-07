@@ -28,9 +28,11 @@ final class CurrentValueView<Value: FastisValue>: UIView {
     private lazy var clearButton: UIButton = {
         let button = UIButton(type: .system)
         button.addTarget(self, action: #selector(CurrentValueView.clear), for: .touchUpInside)
-        button.setImage(self.config.clearButtonImage, for: .normal)
+//        button.setImage(self.config.clearButtonImage, for: .normal)
+        button.setTitle(self.config.name ?? "Clear", for: .normal)
+        button.titleLabel?.font = self.config.clearButtonFont
         button.alpha = 0
-        button.tintColor = .systemBlue
+        button.tintColor = .init(red: 16/255, green: 97/255, blue: 255/255, alpha: 1)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -114,7 +116,7 @@ final class CurrentValueView<Value: FastisValue>: UIView {
     }
 
     private func updateStateForCurrentValue() {
-
+        clearButton.setTitle(isArabic == false ? self.config.name ?? "Clear" : "مسح", for: .normal)
         if let value = self.currentValue as? Date {
 
             if (typeCalendar?.identifier == .islamicUmmAlQura) {
@@ -263,5 +265,14 @@ public extension FastisConfig {
          Default value — `Locale.autoupdatingCurrent`
          */
         public var locale: Locale = .autoupdatingCurrent
+        
+        public var name: String? = "Clear"
+        
+        /**
+         Font of the clear button
+         
+         Default value — `.systemFont(ofSize: 17, weight: .semibold)`
+         */
+        public var clearButtonFont: UIFont = .systemFont(ofSize: 12, weight: .regular)
     }
 }

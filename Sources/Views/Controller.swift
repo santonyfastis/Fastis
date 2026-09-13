@@ -588,10 +588,7 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
     }
     
     private func clear() {
-        var visibleDate: Date? = nil
-        self.calendarView.visibleDates { segment in
-            visibleDate = segment.monthDates.first?.date
-        }
+        let savedOffset = self.calendarView.contentOffset
         self.value = nil
         self.viewConfigs.removeAll()
         self.calendarView.deselectAllDates()
@@ -599,9 +596,8 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             [weak self] in
             guard let self else {return}
             self.calendarView.reloadData()
-            if let dateToScroll = visibleDate {
-                self.calendarView.scrollToHeaderForDate(dateToScroll)
-            }
+            self.calendarView.layoutIfNeeded()
+            self.calendarView.contentOffset = savedOffset
         }
         //        self.dismiss(animated: false)
         self.dismissHandler?(.done(self.value))

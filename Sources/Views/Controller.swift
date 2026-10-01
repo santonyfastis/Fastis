@@ -83,25 +83,32 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
             action: #selector(self.cancel)
         )
         barButtonItem.tintColor = self.appearance.barButtonItemsColor
-        return barButtonItem
+        if let font = self.appearance.cancelButtonFont {
+            barButtonItem.setTitleTextAttributes([.font: font], for: .normal)
+        }
+        return barButtonItem.withoutLiquidGlass()
     }()
 
     private lazy var doneBarButtonItem: UIBarButtonItem = {
         if let customButton = self.appearance.customDoneButton {
             customButton.target = self
             customButton.action = #selector(self.done)
-            return customButton
+            return customButton.withoutLiquidGlass()
         }
 
         let barButtonItem = UIBarButtonItem(
             title: isArabic == false ? self.appearance.doneButtonTitle : "تم",
-            style: .done,
+            style: .plain,
             target: self,
             action: #selector(self.done)
         )
         barButtonItem.tintColor = self.appearance.barButtonItemsColor
         barButtonItem.isEnabled = self.allowToChooseNilDate
-        return barButtonItem
+        if let font = self.appearance.doneButtonFont {
+            barButtonItem.setTitleTextAttributes([.font: font], for: .normal)
+            barButtonItem.setTitleTextAttributes([.font: font], for: .disabled)
+        }
+        return barButtonItem.withoutLiquidGlass()
     }()
 
     private lazy var calendarView: JTACMonthView = {
@@ -350,6 +357,7 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
         self.navigationItem.largeTitleDisplayMode = .never
         self.navigationItem.leftBarButtonItem = self.cancelBarButtonItem
         self.navigationItem.rightBarButtonItem = self.doneBarButtonItem
+        self.navigationItem.disableLiquidGlass()
     }
 
     private func configureSubviews() {
@@ -880,7 +888,20 @@ public extension FastisConfig {
          Default value — `.systemBlue`
          */
         public var barButtonItemsColor: UIColor = .systemBlue
-
+ 
+        /**
+         Cancel button font
+ 
+         Default value — `.systemFont(ofSize: 14)`
+         */
+        public var cancelButtonFont: UIFont? = .systemFont(ofSize: 12, weight: .medium)
+        /**
+         Done button font
+ 
+         Default value — `.boldSystemFont(ofSize: 14)`
+         */
+        public var doneButtonFont: UIFont? = .systemFont(ofSize: 12, weight: .medium)
+ 
         /**
          Custom cancel button in navigation bar
 
@@ -911,3 +932,28 @@ public extension FastisController {
         case cancel
     }
 }
+ 
+ 
+// MARK: - Liquid Glass Helpers
+ 
+internal extension UIBarButtonItem {
+ 
+    /// Disables the iOS 26+ Liquid Glass shared background for this bar button item.
+    @discardableResult
+    func withoutLiquidGlass() -> Self {
+        if #available(iOS 26.0, *) {
+            self.hidesSharedBackground = true
+        }
+        return self
+    }
+}
+ 
+internal extension UINavigationItem {
+ 
+    /// Disables Liquid Glass for navigation bar items attached to this navigation item.
+    func disableLiquidGlass() {
+        self.leftBarButtonItem?.withoutLiquidGlass()
+        self.rightBarButtonItem?.withoutLiquidGlass()
+    }
+}
+ 

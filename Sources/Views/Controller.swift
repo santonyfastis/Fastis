@@ -596,26 +596,17 @@ open class FastisController<Value: FastisValue>: UIViewController, JTACMonthView
     }
     
     private func clear() {
-        let savedOffset = self.calendarView.contentOffset
-        var dateToScroll: Date? = nil
-        self.calendarView.visibleDates { segment in
-            dateToScroll = segment.monthDates.first?.date
-        }
-        if dateToScroll == nil {
-            dateToScroll = self.calendarView.visibleDates().monthDates.first?.date
-        }
-        let targetScrollDate = dateToScroll ?? Date()
         self.value = nil
         self.numberOfDatesSelected = 0
         self.dateSelected = nil
         self.viewConfigs.removeAll()
-        self.calendarView.deselectAllDates()
-        DispatchQueue.main.async { [weak self] in
+        self.calendarView.deselectAllDates(triggerSelectionDelegate: false)
+        
+        self.calendarView.visibleDates { [weak self] segment in
             guard let self = self else { return }
-            self.calendarView.reloadData {
-                self.calendarView.layoutIfNeeded()
-                self.calendarView.contentOffset = savedOffset
-                self.calendarView.scrollToHeaderForDate(targetScrollDate)
+            UIView.performWithoutAnimation {
+                let allVisibleIndexPaths = (segment.monthDates + segment.outdates + segment.indates).map(\.indexPath)
+                self.calendarView.reloadItems(at: allVisibleIndexPaths)
             }
         }
         self.dismissHandler?(.done(self.value))

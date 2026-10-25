@@ -19,7 +19,7 @@ final class CurrentValueView<Value: FastisValue>: UIView {
         let label = UILabel()
         label.textColor = .red
 //        label.textColor = self.config.placeholderTextColor
-        label.text = isArabic == false ?  self.config.placeholderTextForRanges : "التاريخ من وإلي"
+        label.text = isArabic == false ?  self.config.placeholderTextForRanges : "التاريخ من وإلى"
         label.font = self.config.textFont
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -166,7 +166,7 @@ final class CurrentValueView<Value: FastisValue>: UIView {
 
             switch Value.mode {
             case .range:
-                    self.label.text = isArabic == false ? self.config.placeholderTextForRanges : "التاريخ من وإلي"
+                    self.label.text = isArabic == false ? self.config.placeholderTextForRanges : "التاريخ من وإلى"
 
             case .single:
                 self.label.text = self.config.placeholderTextForSingle
